@@ -1,0 +1,1933 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cambrón Studio — Estrategia LinkedIn</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+/* ─── TOKENS ─────────────────────────────────── */
+:root {
+  --ink:       #0d0d0f;
+  --ink-2:     #2a2a30;
+  --ink-3:     #5a5a66;
+  --ink-4:     #9898a6;
+  --line:      #e8e8ec;
+  --line-2:    #f2f2f5;
+  --surface:   #fafafa;
+  --white:     #ffffff;
+  --accent:    #1a1a2e;
+  --accent-2:  #2d2d4a;
+  --mark:      #4a3f8f;
+  --mark-lt:   #f0eefb;
+  --ok:        #1e6f4c;
+  --ok-lt:     #ebf5f0;
+  --warn:      #7a3a0a;
+  --warn-lt:   #fdf0e8;
+  --mono:      'DM Mono', monospace;
+  --serif:     'DM Serif Display', Georgia, serif;
+  --sans:      'Instrument Sans', system-ui, sans-serif;
+  --r:         6px;
+  --r-lg:      10px;
+  --sidebar:   240px;
+  --topbar:    56px;
+}
+
+/* ─── RESET ──────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; scroll-behavior: smooth; }
+body {
+  font-family: var(--sans);
+  background: var(--surface);
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+button { cursor: pointer; border: none; background: none; font-family: inherit; }
+input, textarea { font-family: inherit; }
+a { color: inherit; text-decoration: none; }
+
+/* ─── TOPBAR ─────────────────────────────────── */
+.topbar {
+  height: var(--topbar);
+  background: var(--white);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 16px;
+  flex-shrink: 0;
+  z-index: 100;
+}
+.topbar-brand {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.topbar-brand .wordmark {
+  font-family: var(--serif);
+  font-size: 17px;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.topbar-brand .sub {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-4);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.topbar-divider { width: 1px; height: 20px; background: var(--line); margin: 0 4px; }
+
+.search-wrap {
+  flex: 1;
+  max-width: 380px;
+  position: relative;
+}
+.search-wrap input {
+  width: 100%;
+  height: 34px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 0 12px 0 36px;
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--surface);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.search-wrap input::placeholder { color: var(--ink-4); }
+.search-wrap input:focus { border-color: var(--mark); box-shadow: 0 0 0 3px rgba(74,63,143,0.08); }
+.search-icon {
+  position: absolute;
+  left: 11px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--ink-4);
+  pointer-events: none;
+  font-size: 13px;
+}
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.topbar-tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-4);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ─── SHELL ──────────────────────────────────── */
+.shell { display: flex; flex: 1; overflow: hidden; }
+
+/* ─── SIDEBAR ────────────────────────────────── */
+.sidebar {
+  width: var(--sidebar);
+  background: var(--white);
+  border-right: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow-y: auto;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--line); border-radius: 2px; }
+
+.nav-section { padding: 20px 0 4px; }
+.nav-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  padding: 0 16px 8px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  font-size: 13px;
+  color: var(--ink-3);
+  cursor: pointer;
+  border-left: 2px solid transparent;
+  transition: all 0.12s;
+  position: relative;
+}
+.nav-item:hover { color: var(--ink); background: var(--line-2); }
+.nav-item.active {
+  color: var(--ink);
+  font-weight: 600;
+  border-left-color: var(--mark);
+  background: var(--mark-lt);
+}
+.nav-item .nav-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--mark);
+  margin-left: auto;
+  display: none;
+}
+.nav-item.active .nav-dot { display: block; }
+.nav-item .badge {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 9px;
+  background: var(--ink);
+  color: var(--white);
+  padding: 1px 6px;
+  border-radius: 99px;
+}
+.nav-sub {
+  padding-left: 8px;
+}
+.nav-sub .nav-item {
+  padding: 6px 16px 6px 28px;
+  font-size: 12px;
+}
+.nav-sub .nav-item.active { border-left-color: var(--mark); }
+
+/* ─── MAIN ───────────────────────────────────── */
+.main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+  background: var(--surface);
+}
+.main::-webkit-scrollbar { width: 6px; }
+.main::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
+
+/* ─── SECTIONS ───────────────────────────────── */
+.section { display: none; padding: 36px 40px; max-width: 1100px; }
+.section.active { display: block; animation: fadeIn 0.18s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+.page-header { margin-bottom: 32px; }
+.page-title {
+  font-family: var(--serif);
+  font-size: 28px;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+.page-subtitle {
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--ink-3);
+  line-height: 1.6;
+}
+.page-subtitle strong { color: var(--ink); font-weight: 600; }
+
+/* ─── BREADCRUMB ─────────────────────────────── */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 24px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-4);
+  letter-spacing: 0.03em;
+}
+.breadcrumb span { color: var(--ink-3); }
+.breadcrumb .sep { opacity: 0.4; }
+
+/* ─── CARDS GRID ─────────────────────────────── */
+.cards-grid {
+  display: grid;
+  gap: 16px;
+}
+.cards-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+.cards-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+.cards-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+.card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 22px 24px;
+}
+.card-sm { padding: 16px 20px; }
+.card-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  margin-bottom: 10px;
+}
+.card-value {
+  font-family: var(--serif);
+  font-size: 26px;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+}
+.card-value.sm { font-size: 16px; font-family: var(--sans); font-weight: 600; }
+.card-meta { font-size: 12px; color: var(--ink-3); margin-top: 4px; }
+.card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+.card-body { font-size: 13px; color: var(--ink-3); line-height: 1.6; }
+
+/* ─── TABLE ──────────────────────────────────── */
+.table-wrap { border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; }
+table { width: 100%; border-collapse: collapse; }
+thead th {
+  background: var(--surface);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  padding: 11px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+  font-weight: 500;
+}
+tbody tr { border-bottom: 1px solid var(--line-2); }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--line-2); }
+tbody td { padding: 12px 16px; font-size: 13px; color: var(--ink); vertical-align: top; line-height: 1.5; }
+tbody td.muted { color: var(--ink-3); }
+tbody td.mono { font-family: var(--mono); font-size: 12px; }
+
+/* ─── TAGS ───────────────────────────────────── */
+.tag {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 99px;
+  letter-spacing: 0.04em;
+  font-weight: 500;
+}
+.tag-purple { background: var(--mark-lt); color: var(--mark); }
+.tag-green  { background: var(--ok-lt);   color: var(--ok); }
+.tag-warn   { background: var(--warn-lt); color: var(--warn); }
+.tag-dark   { background: var(--ink-2); color: var(--white); }
+.tag-line   { background: transparent; border: 1px solid var(--line); color: var(--ink-3); }
+
+/* ─── DIVIDER ────────────────────────────────── */
+.divider { height: 1px; background: var(--line); margin: 28px 0; }
+.section-title {
+  font-family: var(--serif);
+  font-size: 17px;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  margin-bottom: 16px;
+}
+.section-title-row {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+/* ─── KV ROW ─────────────────────────────────── */
+.kv-block { display: flex; flex-direction: column; gap: 1px; border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; }
+.kv-row { display: flex; background: var(--white); }
+.kv-row:not(:last-child) { border-bottom: 1px solid var(--line-2); }
+.kv-key {
+  width: 200px; flex-shrink: 0;
+  padding: 13px 16px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-4);
+  letter-spacing: 0.04em;
+  background: var(--surface);
+  border-right: 1px solid var(--line-2);
+}
+.kv-val { padding: 13px 16px; font-size: 13px; color: var(--ink); line-height: 1.5; flex: 1; }
+
+/* ─── POST CARDS ─────────────────────────────── */
+.posts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.post-card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+.post-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.07); border-color: #d0d0da; }
+.post-card-header {
+  padding: 14px 18px 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--line-2);
+}
+.post-num {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-4);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+.post-meta { display: flex; gap: 6px; align-items: center; margin-left: auto; flex-wrap: wrap; justify-content: flex-end; }
+.post-body { padding: 14px 18px; flex: 1; }
+.post-text {
+  font-size: 12.5px;
+  color: var(--ink);
+  line-height: 1.65;
+  white-space: pre-line;
+  max-height: 140px;
+  overflow: hidden;
+  position: relative;
+}
+.post-text.expanded { max-height: none; }
+.post-text::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 40px;
+  background: linear-gradient(transparent, var(--white));
+}
+.post-text.expanded::after { display: none; }
+.post-footer {
+  padding: 10px 18px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.post-hashtags {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--mark);
+  letter-spacing: 0.02em;
+  flex: 1;
+}
+.btn-expand {
+  font-size: 11px;
+  color: var(--ink-3);
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  transition: all 0.12s;
+  white-space: nowrap;
+}
+.btn-expand:hover { border-color: var(--ink-3); color: var(--ink); }
+.btn-copy {
+  font-size: 11px;
+  font-family: var(--mono);
+  color: var(--white);
+  background: var(--ink);
+  padding: 5px 12px;
+  border-radius: var(--r);
+  transition: all 0.12s;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+.btn-copy:hover { background: var(--mark); }
+.btn-copy.copied { background: var(--ok); }
+
+/* ─── POSTS FILTER BAR ───────────────────────── */
+.filter-bar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.filter-chip {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  padding: 5px 12px;
+  border: 1px solid var(--line);
+  border-radius: 99px;
+  color: var(--ink-3);
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.filter-chip:hover { border-color: var(--ink-3); color: var(--ink); }
+.filter-chip.active { background: var(--ink); color: var(--white); border-color: var(--ink); }
+
+/* ─── MENSAJE CARD ───────────────────────────── */
+.embudo-block { display: flex; flex-direction: column; gap: 12px; }
+.embudo-header {
+  background: var(--ink);
+  color: var(--white);
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  padding: 18px 24px;
+}
+.embudo-title {
+  font-family: var(--serif);
+  font-size: 17px;
+  margin-bottom: 4px;
+}
+.embudo-meta { font-size: 12px; opacity: 0.6; font-family: var(--mono); }
+.msg-card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+.msg-header {
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--line-2);
+  background: var(--surface);
+}
+.msg-num {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--white);
+  font-family: var(--mono);
+  font-size: 11px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-weight: 500;
+}
+.msg-step { font-size: 13px; font-weight: 600; color: var(--ink); }
+.msg-type { margin-left: auto; }
+.msg-body { display: grid; grid-template-columns: 220px 1fr; }
+.msg-meta-col {
+  padding: 16px 20px;
+  border-right: 1px solid var(--line-2);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: var(--surface);
+}
+.msg-meta-item {}
+.msg-meta-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  margin-bottom: 4px;
+}
+.msg-meta-value { font-size: 12px; color: var(--ink-3); line-height: 1.5; }
+.msg-text-col { padding: 16px 20px; }
+.msg-text-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  margin-bottom: 10px;
+}
+.msg-text-area {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 14px 16px;
+  font-size: 12.5px;
+  color: var(--ink);
+  line-height: 1.7;
+  white-space: pre-line;
+  min-height: 120px;
+  position: relative;
+}
+.msg-copy-row { display: flex; justify-content: flex-end; margin-top: 10px; }
+
+/* ─── KPI TABLE ──────────────────────────────── */
+.kpi-progress { height: 4px; border-radius: 2px; background: var(--line); margin-top: 6px; overflow: hidden; }
+.kpi-bar { height: 100%; border-radius: 2px; background: var(--mark); }
+
+/* ─── HASHTAG CLOUD ──────────────────────────── */
+.hashtag-cloud { display: flex; flex-wrap: wrap; gap: 8px; }
+.hashtag-item {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 5px 12px;
+  border-radius: 99px;
+  border: 1px solid var(--line);
+  color: var(--ink-3);
+  letter-spacing: 0.02em;
+  transition: all 0.12s;
+  cursor: default;
+}
+.hashtag-item:hover { border-color: var(--mark); color: var(--mark); background: var(--mark-lt); }
+.hashtag-item.lg { font-size: 13px; padding: 6px 14px; }
+
+/* ─── PROFILE HERO ───────────────────────────── */
+.profile-hero {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.profile-banner {
+  height: 80px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 50%, #1e1a42 100%);
+  position: relative;
+}
+.profile-banner-text {
+  position: absolute;
+  bottom: 12px; left: 20px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+}
+.profile-body { padding: 20px 24px 24px; }
+.profile-avatar-row { display: flex; align-items: flex-end; gap: 16px; margin-top: -32px; margin-bottom: 14px; }
+.profile-avatar {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  background: var(--ink);
+  border: 3px solid var(--white);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--serif);
+  font-size: 20px;
+  color: var(--white);
+  flex-shrink: 0;
+}
+.profile-name { font-family: var(--serif); font-size: 20px; color: var(--ink); letter-spacing: -0.01em; }
+.profile-role { font-size: 12px; color: var(--ink-3); margin-top: 2px; }
+.profile-headline {
+  font-size: 13px;
+  color: var(--ink);
+  line-height: 1.6;
+  margin-bottom: 14px;
+  padding: 14px 16px;
+  background: var(--mark-lt);
+  border-radius: var(--r);
+  border-left: 3px solid var(--mark);
+}
+.profile-about {
+  font-size: 13px;
+  color: var(--ink-3);
+  line-height: 1.7;
+  white-space: pre-line;
+}
+.cta-block {
+  margin-top: 16px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  font-size: 13px;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.cta-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-4); flex-shrink: 0; }
+
+/* ─── STAT CARDS ─────────────────────────────── */
+.stat-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 24px; }
+.stat-card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 18px 20px;
+}
+.stat-num {
+  font-family: var(--serif);
+  font-size: 28px;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+}
+.stat-label { font-family: var(--mono); font-size: 9px; color: var(--ink-4); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 4px; }
+.stat-delta { font-size: 11px; color: var(--ok); margin-top: 6px; font-family: var(--mono); }
+
+/* ─── SEARCH RESULTS ─────────────────────────── */
+.search-results { display: none; position: absolute; top: 100%; left: 0; right: 0; background: var(--white); border: 1px solid var(--line); border-radius: var(--r-lg); margin-top: 4px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); z-index: 200; max-height: 320px; overflow-y: auto; }
+.search-results.show { display: block; }
+.search-result-item { padding: 12px 16px; cursor: pointer; border-bottom: 1px solid var(--line-2); transition: background 0.1s; }
+.search-result-item:last-child { border-bottom: none; }
+.search-result-item:hover { background: var(--line-2); }
+.sri-section { font-family: var(--mono); font-size: 9px; color: var(--ink-4); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 2px; }
+.sri-title { font-size: 13px; color: var(--ink); }
+.sri-preview { font-size: 12px; color: var(--ink-3); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ─── MISC ───────────────────────────────────── */
+.gap-8 { display: flex; flex-direction: column; gap: 8px; }
+.gap-12 { display: flex; flex-direction: column; gap: 12px; }
+.gap-16 { display: flex; flex-direction: column; gap: 16px; }
+.gap-24 { display: flex; flex-direction: column; gap: 24px; }
+.row { display: flex; gap: 16px; }
+.flex-1 { flex: 1; }
+.mt-16 { margin-top: 16px; }
+.mt-24 { margin-top: 24px; }
+.mt-32 { margin-top: 32px; }
+.text-mono { font-family: var(--mono); font-size: 11px; letter-spacing: 0.04em; }
+.text-muted { color: var(--ink-3); }
+.text-sm { font-size: 12px; }
+.fw-600 { font-weight: 600; }
+</style>
+</head>
+<body>
+
+<!-- ─── TOPBAR ──────────────────────────────────────── -->
+<div class="topbar">
+  <div class="topbar-brand">
+    <span class="wordmark">Cambrón Studio</span>
+    <div class="topbar-divider"></div>
+    <span class="sub">LinkedIn Strategy</span>
+  </div>
+  <div class="search-wrap" style="position:relative">
+    <span class="search-icon">&#x2315;</span>
+    <input type="text" id="globalSearch" placeholder="Buscar contenido, posts, mensajes..." autocomplete="off">
+    <div class="search-results" id="searchResults"></div>
+  </div>
+  <div class="topbar-right">
+    <span class="topbar-tag">Laura Cambrón Sánchez</span>
+    <span class="tag tag-dark">CEO &amp; Fundadora</span>
+  </div>
+</div>
+
+<!-- ─── SHELL ───────────────────────────────────────── -->
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="nav-section">
+      <div class="nav-label">General</div>
+      <div class="nav-item active" data-section="overview">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.4"/></svg>
+        Resumen
+        <span class="nav-dot"></span>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Perfil LinkedIn</div>
+      <div class="nav-item" data-section="perfil-identidad">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.4"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Identidad &amp; Headline
+      </div>
+      <div class="nav-item" data-section="perfil-about">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h8M2 12h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Acerca de &amp; CTA
+      </div>
+      <div class="nav-item" data-section="perfil-exp">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="1" y="5" width="14" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 5V3.5A1.5 1.5 0 016.5 2h3A1.5 1.5 0 0111 3.5V5" stroke="currentColor" stroke-width="1.4"/></svg>
+        Experiencia &amp; SEO
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Segmentacion</div>
+      <div class="nav-item" data-section="seg-persona1">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2L2 5v4c0 3.3 2.7 6 6 7 3.3-1 6-3.7 6-7V5L8 2z" stroke="currentColor" stroke-width="1.4"/></svg>
+        Persona 1 — Mkt Manager
+      </div>
+      <div class="nav-item" data-section="seg-persona2">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2L2 5v4c0 3.3 2.7 6 6 7 3.3-1 6-3.7 6-7V5L8 2z" stroke="currentColor" stroke-width="1.4"/></svg>
+        Persona 2 — CEO / Founder
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Embudos</div>
+      <div class="nav-item" data-section="embudo1">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 3h12l-4.5 6V14l-3-1V9L2 3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+        Embudo 1 — Reunion
+      </div>
+      <div class="nav-item" data-section="embudo2">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 3h12l-4.5 6V14l-3-1V9L2 3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+        Embudo 2 — Demo
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Contenido</div>
+      <div class="nav-item" data-section="posts-all">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M4 5h8M4 8h5M4 11h7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Todas las publicaciones
+        <span class="badge">20</span>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Estrategia</div>
+      <div class="nav-item" data-section="crecimiento">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 12l4-4 3 3 5-6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Crecimiento &amp; KPIs
+      </div>
+      <div class="nav-item" data-section="hashtags">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M4 2v12M12 2v12M2 6h12M2 10h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Hashtags &amp; Keywords
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ═══ OVERVIEW ═══════════════════════════════════════ -->
+    <div class="section active" id="overview">
+      <div class="breadcrumb"><span>Dashboard</span><span class="sep">/</span><span>Resumen</span></div>
+      <div class="page-header">
+        <div class="page-title">Estrategia LinkedIn</div>
+        <div class="page-subtitle">Laura Cambrón Sánchez &mdash; <strong>CEO &amp; Fundadora, Cambrón Studio</strong> &mdash; Publicidad Creativa &amp; Neuromarketing, Barcelona</div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="stat-num">20</div>
+          <div class="stat-label">Publicaciones</div>
+          <div class="stat-delta">3x semana — Lun, Mie, Vie</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">2</div>
+          <div class="stat-label">Embudos</div>
+          <div class="stat-delta">6 impactos totales</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">2</div>
+          <div class="stat-label">Buyer Personas</div>
+          <div class="stat-delta">Sales Navigator filters</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">10&ndash;15</div>
+          <div class="stat-label">Leads / mes</div>
+          <div class="stat-delta">Objetivo mes 6+</div>
+        </div>
+      </div>
+
+      <div class="cards-grid cols-2">
+        <div class="card">
+          <div class="card-label">Propuesta de valor</div>
+          <div class="card-title">Headline optimizado</div>
+          <div class="card-body">Ayudo a marcas a aumentar sus ventas mediante publicidad estratégica y neuromarketing basado en el comportamiento del consumidor &nbsp;|&nbsp; CEO @ Cambrón Studio &nbsp;|&nbsp; Barcelona</div>
+        </div>
+        <div class="card">
+          <div class="card-label">CTA principal</div>
+          <div class="card-title">Llamada a la acción</div>
+          <div class="card-body">Escríbeme para analizar cómo mejorar la efectividad de tus campañas publicitarias. Integrado en el extracto, destacados y mensaje de bienvenida.</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section-title">Mapa de contenidos por semana</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Semana</th><th>Lunes</th><th>Miercoles</th><th>Viernes</th><th>Enfoque</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="mono">S1</td><td>Post 1 — Neuromarketing (Educativo)</td><td>Post 2 — Branding (Carrusel)</td><td>Post 3 — Opinion</td><td><span class="tag tag-purple">Awareness</span></td></tr>
+            <tr><td class="mono">S2</td><td>Post 4 — Engagement</td><td>Post 5 — Storytelling</td><td>Post 6 — Framework</td><td><span class="tag tag-purple">Awareness</span></td></tr>
+            <tr><td class="mono">S3</td><td>Post 7 — Caso Before/After</td><td>Post 8 — Concepto clave</td><td>Post 9 — Debate</td><td><span class="tag tag-green">Consideracion</span></td></tr>
+            <tr><td class="mono">S4</td><td>Post 10 — Dato sorprendente</td><td>Post 11 — Behind Scenes</td><td>Post 12 — Checklist</td><td><span class="tag tag-green">Consideracion</span></td></tr>
+            <tr><td class="mono">S5</td><td>Post 13 — Inspiracional</td><td>Post 14 — Sector Tech</td><td>Post 15 — Testimonial</td><td><span class="tag tag-warn">Conversion</span></td></tr>
+            <tr><td class="mono">S6</td><td>Post 16 — Tendencias</td><td>Post 17 — Manifiesto</td><td>Post 18 — Quick Tip</td><td><span class="tag tag-warn">Conversion</span></td></tr>
+            <tr><td class="mono">S7</td><td>Post 19 — Networking</td><td>Post 20 — Oferta/CTA</td><td>—</td><td><span class="tag tag-dark">Fidelizacion</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══ PERFIL IDENTIDAD ════════════════════════════════ -->
+    <div class="section" id="perfil-identidad">
+      <div class="breadcrumb"><span>Perfil</span><span class="sep">/</span><span>Identidad &amp; Headline</span></div>
+      <div class="page-header">
+        <div class="page-title">Identidad del Perfil</div>
+        <div class="page-subtitle">Configuracion basica de la presencia de Laura en LinkedIn</div>
+      </div>
+
+      <div class="profile-hero">
+        <div class="profile-banner">
+          <div class="profile-banner-text">CAMBRON STUDIO · PUBLICIDAD CREATIVA · NEUROMARKETING · BARCELONA</div>
+        </div>
+        <div class="profile-body">
+          <div class="profile-avatar-row">
+            <div class="profile-avatar">LC</div>
+            <div>
+              <div class="profile-name">Laura Cambron Sanchez</div>
+              <div class="profile-role">CEO &amp; Fundadora · Cambron Studio · Barcelona, Cataluna</div>
+            </div>
+          </div>
+          <div class="profile-headline">Ayudo a marcas a aumentar sus ventas mediante publicidad estratégica y neuromarketing basado en el comportamiento del consumidor &nbsp;|&nbsp; CEO @ Cambrón Studio &nbsp;|&nbsp; Barcelona</div>
+        </div>
+      </div>
+
+      <div class="section-title">Datos basicos del perfil</div>
+      <div class="kv-block">
+        <div class="kv-row"><div class="kv-key">Nombre completo</div><div class="kv-val">Laura Cambrón Sánchez</div></div>
+        <div class="kv-row"><div class="kv-key">Cargo</div><div class="kv-val">CEO &amp; Fundadora · Cambrón Studio</div></div>
+        <div class="kv-row"><div class="kv-key">Empresa</div><div class="kv-val">Cambrón Studio</div></div>
+        <div class="kv-row"><div class="kv-key">Ubicacion</div><div class="kv-val">Barcelona, Cataluña, España</div></div>
+        <div class="kv-row"><div class="kv-key">URL personalizada</div><div class="kv-val" style="font-family:var(--mono);font-size:12px">linkedin.com/in/lauracambron-ceo</div></div>
+        <div class="kv-row"><div class="kv-key">Idiomas</div><div class="kv-val">Español (principal) · English</div></div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="section-title">Headline — Justificacion de la estructura</div>
+      <div class="cards-grid cols-2">
+        <div class="card card-sm"><div class="card-label">Elemento 1</div><div class="card-title">Verbo de accion orientado al cliente</div><div class="card-body">"Ayudo a marcas…" — posiciona a Laura como solucionadora, no como vendedora.</div></div>
+        <div class="card card-sm"><div class="card-label">Elemento 2</div><div class="card-title">Propuesta de valor diferencial</div><div class="card-body">Neuromarketing + publicidad estratégica — diferenciador claro frente a agencias genéricas.</div></div>
+        <div class="card card-sm"><div class="card-label">Elemento 3</div><div class="card-title">Credenciales de autoridad</div><div class="card-body">CEO @ Cambrón Studio — cargo y empresa refuerzan la credibilidad del perfil.</div></div>
+        <div class="card card-sm"><div class="card-label">Elemento 4</div><div class="card-title">Segmentacion geografica</div><div class="card-body">Barcelona — activa el filtro de ubicacion del algoritmo de Sales Navigator.</div></div>
+      </div>
+    </div>
+
+    <!-- ═══ PERFIL ABOUT ═════════════════════════════════════ -->
+    <div class="section" id="perfil-about">
+      <div class="breadcrumb"><span>Perfil</span><span class="sep">/</span><span>Acerca de &amp; CTA</span></div>
+      <div class="page-header">
+        <div class="page-title">Extracto "Acerca de"</div>
+        <div class="page-subtitle">Texto orientado al cliente potencial (~1.900 caracteres). Copia el texto completo para usarlo directamente.</div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-label">Extracto completo — listo para copiar</div>
+        <div id="aboutText" class="profile-about" style="margin-top:10px">La mayoría de marcas creen que su principal problema es la visibilidad.
+Pero en realidad, no se trata de cuántas personas te ven… sino de cuánto impacto generas cuando te ven.
+
+Hoy vivimos en un entorno completamente saturado de estímulos publicitarios. Cada usuario recibe cientos de impactos diarios, lo que ha reducido la capacidad de atención y ha aumentado la exigencia del consumidor.
+
+En este contexto, no basta con estar presente. Las marcas que realmente crecen son las que consiguen conectar emocionalmente, diferenciarse de la competencia y provocar acción real en su audiencia.
+
+En Cambrón Studio ayudamos a empresas a transformar su comunicación en herramientas de impacto real mediante estrategias basadas en el comportamiento del consumidor y neuromarketing.
+
+Nuestro trabajo se centra en:
+— Diseñar campañas publicitarias más estratégicas y orientadas a conversión
+— Aplicar principios de neuromarketing para entender cómo decide el consumidor
+— Optimizar la efectividad de las acciones de marketing existentes
+— Construir marcas más sólidas, memorables y diferenciadas en su sector
+
+No creemos en la publicidad como simple "difusión de mensajes". Creemos en la publicidad como una herramienta de influencia estratégica basada en cómo piensan, sienten y deciden las personas.
+
+Si quieres analizar cómo mejorar la efectividad de tu publicidad o revisar tu estrategia actual, escríbeme y lo vemos juntos.</div>
+        <div style="display:flex;justify-content:flex-end;margin-top:14px">
+          <button class="btn-copy" onclick="copyText('aboutText',this)">Copiar extracto</button>
+        </div>
+      </div>
+
+      <div class="cta-block">
+        <span class="cta-label">CTA</span>
+        <span>Escríbeme para analizar cómo mejorar la efectividad de tus campañas publicitarias</span>
+        <button class="btn-copy" onclick="copyElement('Escríbeme para analizar cómo mejorar la efectividad de tus campañas publicitarias',this)" style="margin-left:auto">Copiar CTA</button>
+      </div>
+
+      <div class="divider"></div>
+      <div class="section-title">Ubicacion del CTA en el perfil</div>
+      <div class="cards-grid cols-3">
+        <div class="card card-sm"><div class="card-label">Ubicacion 1</div><div class="card-title">Final del extracto</div><div class="card-body">Integrado en las ultimas lineas del "Acerca de" como llamada directa a contactar.</div></div>
+        <div class="card card-sm"><div class="card-label">Ubicacion 2</div><div class="card-title">Seccion Destacados</div><div class="card-body">LinkedIn Featured con enlace a landing o guía gratuita como primer recurso de valor.</div></div>
+        <div class="card card-sm"><div class="card-label">Ubicacion 3</div><div class="card-title">Mensaje de bienvenida</div><div class="card-body">Mensaje automático al conectar que introduce el CTA sin resultar intrusivo.</div></div>
+      </div>
+    </div>
+
+    <!-- ═══ PERFIL EXP ════════════════════════════════════════ -->
+    <div class="section" id="perfil-exp">
+      <div class="breadcrumb"><span>Perfil</span><span class="sep">/</span><span>Experiencia &amp; SEO</span></div>
+      <div class="page-header">
+        <div class="page-title">Experiencia &amp; Palabras Clave</div>
+        <div class="page-subtitle">Historial profesional alineado con la empresa y keywords de posicionamiento SEO para LinkedIn</div>
+      </div>
+
+      <div class="section-title">Experiencia profesional</div>
+      <div class="gap-12">
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+            <div style="width:40px;height:40px;background:var(--ink);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:13px;color:var(--white);flex-shrink:0">CS</div>
+            <div>
+              <div class="fw-600" style="font-size:14px">CEO &amp; Founder — Cambrón Studio</div>
+              <div class="text-muted text-sm">2023 – Presente · 2 años · Barcelona, España · Jornada completa</div>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Responsabilidad</th><th>Area</th></tr></thead>
+              <tbody>
+                <tr><td>Dirección de estrategias de publicidad digital</td><td class="mono muted">Estrategia</td></tr>
+                <tr><td>Aplicación de neuromarketing en campañas</td><td class="mono muted">Neuromarketing</td></tr>
+                <tr><td>Desarrollo de branding y posicionamiento de marca</td><td class="mono muted">Branding</td></tr>
+                <tr><td>Optimización de conversiones publicitarias</td><td class="mono muted">Performance</td></tr>
+                <tr><td>Análisis del comportamiento del consumidor</td><td class="mono muted">Research</td></tr>
+                <tr><td>Diseño de campañas creativas orientadas a resultados</td><td class="mono muted">Creatividad</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+            <div style="width:40px;height:40px;background:var(--line);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:13px;color:var(--ink-3);flex-shrink:0">FL</div>
+            <div>
+              <div class="fw-600" style="font-size:14px">Consultora de Marketing Digital — Freelance</div>
+              <div class="text-muted text-sm">2021 – 2023 · Remoto</div>
+            </div>
+          </div>
+          <ul style="padding-left:20px;display:flex;flex-direction:column;gap:6px">
+            <li class="text-sm text-muted">Gestión de cuentas de publicidad digital (Meta Ads, Google Ads)</li>
+            <li class="text-sm text-muted">Desarrollo de estrategias de contenido para marcas B2B y B2C</li>
+            <li class="text-sm text-muted">Análisis de datos y optimización de campañas publicitarias</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="section-title">Keywords de posicionamiento SEO</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Keywords primarias</th><th>Keywords secundarias</th><th>Long-tail</th></tr></thead>
+          <tbody>
+            <tr><td>Neuromarketing</td><td>Branding estratégico</td><td>Publicidad basada en comportamiento</td></tr>
+            <tr><td>Publicidad digital</td><td>Marketing de contenidos</td><td>Estrategia de comunicación B2B</td></tr>
+            <tr><td>Comportamiento del consumidor</td><td>Conversión publicitaria</td><td>Campañas orientadas a resultados</td></tr>
+            <tr><td>Estrategia publicitaria</td><td>Psicología del consumidor</td><td>Agencia creativa Barcelona</td></tr>
+            <tr><td>Estrategia de marca</td><td>Publicidad creativa</td><td>CEO agencia neuromarketing España</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══ SEGMENTACION PERSONA 1 ══════════════════════════════ -->
+    <div class="section" id="seg-persona1">
+      <div class="breadcrumb"><span>Segmentacion</span><span class="sep">/</span><span>Buyer Persona 1</span></div>
+      <div class="page-header">
+        <div class="page-title">Buyer Persona 1</div>
+        <div class="page-subtitle">Marketing Manager en empresa mediana — Filtros Sales Navigator aplicados</div>
+      </div>
+
+      <div class="cards-grid cols-2" style="margin-bottom:20px">
+        <div class="card card-sm"><div class="card-label">Representacion</div><div class="card-title">Laura Sanchez, 32 años</div><div class="card-body">Marketing Manager en empresa mediana de Barcelona. Gestiona campañas y branding. Siente que sus acciones no generan el impacto esperado.</div></div>
+        <div class="card card-sm"><div class="card-label">Comportamiento LinkedIn</div><div class="card-title">Consumo activo de contenido</div><div class="card-body">Consume contenido educativo de marketing. Interactúa con tips, casos reales e insights. Activa y presente en la plataforma.</div></div>
+      </div>
+
+      <div class="kv-block">
+        <div class="kv-row"><div class="kv-key">Sector / Industria</div><div class="kv-val">Marketing y Publicidad &nbsp;·&nbsp; Consultoría &nbsp;·&nbsp; Retail &nbsp;·&nbsp; E-commerce &nbsp;·&nbsp; Tecnología &nbsp;·&nbsp; FMCG</div></div>
+        <div class="kv-row"><div class="kv-key">Tamaño de empresa</div><div class="kv-val">51–200 empleados (mediana empresa) &nbsp;·&nbsp; también 201–500 con equipo de marketing reducido</div></div>
+        <div class="kv-row"><div class="kv-key">Ubicacion geografica</div><div class="kv-val">España (prioridad: Barcelona, Madrid, Valencia) &nbsp;·&nbsp; Latinoamérica (México, Colombia, Argentina)</div></div>
+        <div class="kv-row"><div class="kv-key">Cargo / Rol</div><div class="kv-val">Marketing Manager &nbsp;·&nbsp; CMO &nbsp;·&nbsp; Director de Marketing &nbsp;·&nbsp; Responsable de Comunicación &nbsp;·&nbsp; Brand Manager</div></div>
+        <div class="kv-row"><div class="kv-key">Nivel de seniority</div><div class="kv-val">Senior (5–10 años de experiencia) &nbsp;·&nbsp; Manager &nbsp;·&nbsp; Director</div></div>
+        <div class="kv-row"><div class="kv-key">Filtro adicional SN</div><div class="kv-val">Función: Marketing &nbsp;·&nbsp; Ha publicado en LinkedIn (engagement activo) &nbsp;·&nbsp; Cambio de trabajo reciente (últimos 3 meses)</div></div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="section-title">Pain points y justificacion de filtros</div>
+      <div class="cards-grid cols-2">
+        <div class="card card-sm"><div class="card-label">Pain point 1</div><div class="card-title">Campanas que no convierten</div><div class="card-body">Alto gasto en publicidad sin retorno medible. Invierten sin estrategia psicológica de base.</div></div>
+        <div class="card card-sm"><div class="card-label">Pain point 2</div><div class="card-title">Saturacion publicitaria</div><div class="card-body">Dificultad para destacar en entornos saturados de impactos. Baja atención del consumidor.</div></div>
+        <div class="card card-sm"><div class="card-label">Pain point 3</div><div class="card-title">Diferenciacion de marca</div><div class="card-body">Marcas percibidas como genéricas. Sin historia ni propuesta de valor clara y diferencial.</div></div>
+        <div class="card card-sm"><div class="card-label">Pain point 4</div><div class="card-title">Falta de enfoque psicologico</div><div class="card-body">Estrategias basadas en intuición, no en cómo funciona realmente la mente del consumidor.</div></div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="section-title">Justificacion de los filtros</div>
+      <div class="gap-8">
+        <div class="card card-sm"><div class="card-body">Las medianas empresas tienen presupuesto real de marketing pero no siempre internalizan el expertise estratégico, haciéndolas ideales para contratar a una agencia externa especializada.</div></div>
+        <div class="card card-sm"><div class="card-body">Barcelona y Madrid concentran el mayor ecosistema de empresas con inversión en publicidad digital en España.</div></div>
+        <div class="card card-sm"><div class="card-body">El enfoque en Marketing Managers y CMOs garantiza interlocución directa con el decisor de compra del servicio.</div></div>
+        <div class="card card-sm"><div class="card-body">El filtro "cambio de trabajo reciente" detecta profesionales con nuevas responsabilidades y presupuesto disponible para proyectos de inicio.</div></div>
+      </div>
+    </div>
+
+    <!-- ═══ SEGMENTACION PERSONA 2 ══════════════════════════════ -->
+    <div class="section" id="seg-persona2">
+      <div class="breadcrumb"><span>Segmentacion</span><span class="sep">/</span><span>Buyer Persona 2</span></div>
+      <div class="page-header">
+        <div class="page-title">Buyer Persona 2</div>
+        <div class="page-subtitle">CEO / Fundador de startup o PYME — Filtros Sales Navigator aplicados</div>
+      </div>
+
+      <div class="kv-block" style="margin-bottom:20px">
+        <div class="kv-row"><div class="kv-key">Sector / Industria</div><div class="kv-val">Startups tecnológicas &nbsp;·&nbsp; SaaS &nbsp;·&nbsp; Servicios profesionales &nbsp;·&nbsp; E-commerce &nbsp;·&nbsp; Alimentación &nbsp;·&nbsp; Educación</div></div>
+        <div class="kv-row"><div class="kv-key">Tamaño de empresa</div><div class="kv-val">1–10 empleados (startup) &nbsp;·&nbsp; 11–50 empleados (PYME en crecimiento)</div></div>
+        <div class="kv-row"><div class="kv-key">Ubicacion</div><div class="kv-val">España y Latinoamérica &nbsp;·&nbsp; Barcelona (22@) &nbsp;·&nbsp; Madrid (Wayra) &nbsp;·&nbsp; Bogotá &nbsp;·&nbsp; Ciudad de México</div></div>
+        <div class="kv-row"><div class="kv-key">Cargo / Rol</div><div class="kv-val">CEO &nbsp;·&nbsp; Fundador &nbsp;·&nbsp; Co-fundador &nbsp;·&nbsp; Emprendedor &nbsp;·&nbsp; Director General</div></div>
+        <div class="kv-row"><div class="kv-key">Nivel de seniority</div><div class="kv-val">Owner &nbsp;·&nbsp; Director &nbsp;·&nbsp; C-Level &nbsp;·&nbsp; Founder</div></div>
+        <div class="kv-row"><div class="kv-key">Filtro adicional SN</div><div class="kv-val">Ha mencionado "lanzamiento" o "crecimiento" en publicaciones &nbsp;·&nbsp; Empresa fundada hace menos de 3 años &nbsp;·&nbsp; Función: Entrepreneurship</div></div>
+      </div>
+
+      <div class="section-title">Pain points especificos</div>
+      <div class="cards-grid cols-3">
+        <div class="card card-sm"><div class="card-label">Pain 1</div><div class="card-title">Visibilidad reducida</div><div class="card-body">Presupuesto limitado para competir con marcas establecidas. Necesitan maximizar cada euro invertido.</div></div>
+        <div class="card card-sm"><div class="card-label">Pain 2</div><div class="card-title">Sin equipo de marketing</div><div class="card-body">El CEO gestiona el marketing solo o con recursos escasos. Necesita estrategia externa de confianza.</div></div>
+        <div class="card card-sm"><div class="card-label">Pain 3</div><div class="card-title">Diferenciacion rapida</div><div class="card-body">La velocidad de mercado exige diferenciarse rápido. No pueden permitirse años de construcción de marca.</div></div>
+        <div class="card card-sm"><div class="card-label">Pain 4</div><div class="card-title">Campanas sin estrategia</div><div class="card-body">Lanzan campañas sin base psicológica ni entendimiento del cliente. Presupuesto malgastado.</div></div>
+        <div class="card card-sm"><div class="card-label">Pain 5</div><div class="card-title">No captan atencion</div><div class="card-body">Sus mensajes no conectan emocionalmente. El cliente objetivo no se identifica con la propuesta.</div></div>
+        <div class="card card-sm"><div class="card-label">Pain 6</div><div class="card-title">Comunicacion del producto</div><div class="card-body">Explican la tecnología pero no el problema que resuelven. El cliente no entiende el valor.</div></div>
+      </div>
+    </div>
+
+    <!-- ═══ EMBUDO 1 ══════════════════════════════════════════ -->
+    <div class="section" id="embudo1">
+      <div class="breadcrumb"><span>Embudos</span><span class="sep">/</span><span>Embudo 1 — Reunion</span></div>
+      <div class="page-header">
+        <div class="page-title">Embudo 1 — Reunion de Descubrimiento</div>
+        <div class="page-subtitle">Objetivo: videollamada de 20 minutos con Marketing Managers &nbsp;·&nbsp; Enfoque: valor educativo — personalizacion — CTA directo</div>
+      </div>
+
+      <div class="gap-16" id="embudo1-msgs">
+        <!-- MSG 1 -->
+        <div class="msg-card">
+          <div class="msg-header">
+            <div class="msg-num">1</div>
+            <div class="msg-step">Solicitud de conexion</div>
+            <div class="msg-type"><span class="tag tag-purple">Conexion</span></div>
+          </div>
+          <div class="msg-body">
+            <div class="msg-meta-col">
+              <div class="msg-meta-item"><div class="msg-meta-label">Contexto</div><div class="msg-meta-value">Se envía tras identificar al prospecto en Sales Navigator. Laura comenta uno de sus posts antes de enviar la solicitud.</div></div>
+              <div class="msg-meta-item"><div class="msg-meta-label">Objetivo</div><div class="msg-meta-value">Conectar y generar primer impacto positivo. Tasa objetivo: mayor del 40% de aceptacion.</div></div>
+              <div class="msg-meta-item"><div class="msg-meta-label">Justificacion</div><div class="msg-meta-value">La nota personalizada con referencia a contenido real dispara la tasa de aceptacion. No vender en el primer mensaje es clave.</div></div>
+            </div>
+            <div class="msg-text-col">
+              <div class="msg-text-label">Texto del mensaje — listo para copiar</div>
+              <div class="msg-text-area" id="e1m1">Hola [Nombre],
+
+He leído tu post sobre [tema específico del post de la persona] y me ha parecido muy acertado, especialmente la parte de [detalle concreto].
+
+Trabajo ayudando a equipos de marketing a mejorar el impacto de sus campañas aplicando neuromarketing y estrategia basada en comportamiento del consumidor.
+
+Me gustaría conectar y seguir tu trabajo.
+
+Un saludo,
+Laura</div>
+              <div class="msg-copy-row"><button class="btn-copy" onclick="copyText('e1m1',this)">Copiar mensaje</button></div>
+            </div>
+          </div>
+        </div>
+        <!-- MSG 2 -->
+        <div class="msg-card">
+          <div class="msg-header">
+            <div class="msg-num">2</div>
+            <div class="msg-step">Aporte de valor</div>
+            <div class="msg-type"><span class="tag tag-green">5–7 dias despues</span></div>
+          </div>
+          <div class="msg-body">
+            <div class="msg-meta-col">
+              <div class="msg-meta-item"><div class="msg-meta-label">Contexto</div><div class="msg-meta-value">5–7 días después de aceptada la conexión. Laura ha revisado el perfil y detectado el sector/empresa del prospecto.</div></div>
+              <div class="msg-meta-item"><div class="msg-meta-label">Objetivo</div><div class="msg-meta-value">Generar confianza y reciprocidad aportando valor sin pedir nada a cambio.</div></div>
+              <div class="msg-meta-item"><div class="msg-meta-label">Justificacion</div><div class="msg-meta-value">Principio de reciprocidad de Cialdini: dar antes de pedir. Recurso gratuito + personalizado abre la conversacion de forma no intrusiva.</div></div>
+            </div>
+            <div class="msg-text-col">
+              <div class="msg-text-label">Texto del mensaje — listo para copiar</div>
+              <div class="msg-text-area" id="e1m2">Hola [Nombre], gracias por conectar.
+
+Sé que en [sector/empresa] uno de los retos más comunes es conseguir que las campañas publicitarias conviertan de verdad, no solo que tengan reach.
+
+Te comparto este framework de 3 pasos que usamos en Cambrón Studio para analizar si una campaña tiene potencial de conversión antes de lanzarla:
+
+1. Analiza si el mensaje activa una emoción específica
+2. Comprueba si hay fricción cognitiva en el CTA
+3. Mide la coherencia entre promesa del anuncio y landing page
+
+Si quieres, te paso también la plantilla que usamos internamente para hacer este diagnóstico. Sin compromiso, es algo que creo que puede serte útil.
+
+¿Te interesaría?
+
+Un saludo,
+Laura</div>
+              <div class="msg-copy-row"><button class="btn-copy" onclick="copyText('e1m2',this)">Copiar mensaje</button></div>
+            </div>
+          </div>
+        </div>
+        <!-- MSG 3 -->
+        <div class="msg-card">
+          <div class="msg-header">
+            <div class="msg-num">3</div>
+            <div class="msg-step">CTA directo</div>
+            <div class="msg-type"><span class="tag tag-warn">3–4 dias despues</span></div>
+          </div>
+          <div class="msg-body">
+            <div class="msg-meta-col">
+              <div class="msg-meta-item"><div class="msg-meta-label">Contexto</div><div class="msg-meta-value">Si el prospecto respondió positivamente al mensaje 2 o dio señal de interés (like, visita al perfil).</div></div>
+              <div class="msg-meta-item"><div class="msg-meta-label">Objetivo</div><div class="msg-meta-value">Conseguir una videollamada de 20 minutos. Tasa objetivo: mayor del 15% de conversion a reunion.</div></div>
+              <div class="msg-meta-item"><div class="msg-meta-label">Justificacion</div><div class="msg-meta-value">Propuesta concreta y de bajo compromiso. Ofrecer dos opciones de dia (en lugar de preguntar cuándo) aumenta la probabilidad de respuesta.</div></div>
+            </div>
+            <div class="msg-text-col">
+              <div class="msg-text-label">Texto del mensaje — listo para copiar</div>
+              <div class="msg-text-area" id="e1m3">Hola [Nombre],
+
+Muchas gracias por tu interés en el framework. Me alegra que pueda ser útil.
+
+Tengo una pregunta directa: ¿estarías abierto/a a una llamada rápida de 20 minutos para analizar específicamente cómo está funcionando tu estrategia publicitaria actual y si hay algún punto de mejora que podamos identificar juntos?
+
+No es una llamada de venta. Es simplemente un diagnóstico: te aporto valor real y tú decides si tiene sentido trabajar juntos.
+
+¿Tienes disponibilidad el martes o el jueves de la próxima semana?
+
+Un saludo,
+Laura Cambrón
+CEO · Cambrón Studio</div>
+              <div class="msg-copy-row"><button class="btn-copy" onclick="copyText('e1m3',this)">Copiar mensaje</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ EMBUDO 2 ══════════════════════════════════════════ -->
+    <div class="section" id="embudo2">
+      <div class="breadcrumb"><span>Embudos</span><span class="sep">/</span><span>Embudo 2 — Demo</span></div>
+      <div class="page-header">
+        <div class="page-title">Embudo 2 — Descarga de Recurso + Demo</div>
+        <div class="page-subtitle">Objetivo: CEO/Fundador descarga guia gratuita y agenda demo &nbsp;·&nbsp; Enfoque: educativo — problema-solución — demo con valor</div>
+      </div>
+      <div class="gap-16">
+        <div class="msg-card">
+          <div class="msg-header"><div class="msg-num">1</div><div class="msg-step">Conexion con contexto startup</div><div class="msg-type"><span class="tag tag-purple">Conexion</span></div></div>
+          <div class="msg-body">
+            <div class="msg-meta-col">
+              <div class="msg-meta-item"><div class="msg-meta-label">Contexto</div><div class="msg-meta-value">CEOs/Fundadores de startups con menos de 3 años. Detectadas a través de publicaciones sobre su producto sin estrategia de comunicación clara.</div></div>
+              <div class="msg-meta-item"><div class="msg-meta-label">Objetivo</div><div class="msg-meta-value">Conectar y abrir conversacion con el decisor final.</div></div>
+              <div class="msg-meta-item"><div class="msg-meta-label">Justificacion</div><div class="msg-meta-value">Mencionar la fase de la empresa demuestra que no es un mensaje masivo. La personalización hace que el CEO se sienta identificado.</div></div>
+            </div>
+            <div class="msg-text-col">
+              <div class="msg-text-label">Texto del mensaje — listo para copiar</div>
+              <div class="msg-text-area" id="e2m1">Hola [Nombre],
+
+He visto que [empresa] está en una fase muy interesante de crecimiento. Enhorabuena por lo que estáis construyendo.
+
+Me dedico a ayudar a startups y pymes a comunicar mejor su propuesta de valor y convertir esa comunicación en ventas reales, usando estrategias de publicidad creativa y neuromarketing.
+
+Me gustaría conectar y seguir el camino de [empresa].
+
+Un saludo,
+Laura</div>
+              <div class="msg-copy-row"><button class="btn-copy" onclick="copyText('e2m1',this)">Copiar mensaje</button></div>
+            </div>
+          </div>
+        </div>
+        <div class="msg-card">
+          <div class="msg-header"><div class="msg-num">2</div><div class="msg-step">Entrega de recurso gratuito</div><div class="msg-type"><span class="tag tag-green">4–6 dias despues</span></div></div>
+          <div class="msg-body">
+            <div class="msg-meta-col">
+              <div class="msg-meta-item"><div class="msg-meta-label">Contexto</div><div class="msg-meta-value">Tras la aceptación. El recurso tiene valor independiente y no requiere formulario (fricción cero).</div></div>
+              <div class="msg-meta-item"><div class="msg-meta-label">Objetivo</div><div class="msg-meta-value">Generar confianza profunda y posicionarse como referente. Iniciar la calificacion del prospecto.</div></div>
+              <div class="msg-meta-item"><div class="msg-meta-label">Justificacion</div><div class="msg-meta-value">Los CEOs tienen poco tiempo. Un recurso accionable y breve supera en tasa de apertura a cualquier pitch. La ausencia de formulario elimina la barrera.</div></div>
+            </div>
+            <div class="msg-text-col">
+              <div class="msg-text-label">Texto del mensaje — listo para copiar</div>
+              <div class="msg-text-area" id="e2m2">Hola [Nombre],
+
+Sé que como fundador/a tienes el marketing en mil sitios a la vez y es difícil saber por dónde priorizar.
+
+He preparado una guía breve que uso con startups: "Los 5 errores de comunicación que hacen que los clientes no entiendan qué vendes (y cómo arreglarlos con neuromarketing)".
+
+Te la comparto aquí directamente: [enlace a landing o PDF]
+
+Sin formularios, sin spam. Solo valor.
+
+Si te resulta útil o tienes alguna pregunta después de leerla, encantada de charlar.
+
+Un saludo,
+Laura</div>
+              <div class="msg-copy-row"><button class="btn-copy" onclick="copyText('e2m2',this)">Copiar mensaje</button></div>
+            </div>
+          </div>
+        </div>
+        <div class="msg-card">
+          <div class="msg-header"><div class="msg-num">3</div><div class="msg-step">Propuesta de demo</div><div class="msg-type"><span class="tag tag-warn">5 dias despues</span></div></div>
+          <div class="msg-body">
+            <div class="msg-meta-col">
+              <div class="msg-meta-item"><div class="msg-meta-label">Contexto</div><div class="msg-meta-value">Solo si el prospecto respondió o abrió el enlace. Si no hay respuesta, enviar variante más suave de seguimiento.</div></div>
+              <div class="msg-meta-item"><div class="msg-meta-label">Objetivo</div><div class="msg-meta-value">Agendar una demo de 30 minutos del proceso de trabajo de Cambrón Studio.</div></div>
+              <div class="msg-meta-item"><div class="msg-meta-label">Justificacion</div><div class="msg-meta-value">Lenguaje peer-to-peer sin jerarquías. Caso real reduce el riesgo percibido. La opcion de "no" aumenta paradójicamente la tasa de "sí".</div></div>
+            </div>
+            <div class="msg-text-col">
+              <div class="msg-text-label">Texto del mensaje — listo para copiar</div>
+              <div class="msg-text-area" id="e2m3">Hola [Nombre],
+
+Espero que la guía haya sido útil.
+
+Tengo una propuesta concreta: me gustaría hacer contigo un análisis de 30 minutos de la comunicación actual de [empresa] y enseñarte exactamente qué cambiaríamos nosotros para que el mensaje conecte mejor con vuestro cliente ideal.
+
+Lo hemos hecho con empresas similares a la vuestra en Barcelona y los resultados han sido muy claros en pocas semanas.
+
+Si no es el momento o no encaja, sin problema, te lo digo sin rodeos.
+
+¿Tiene sentido hablar?
+
+Laura
+CEO · Cambrón Studio
+laura@cambronstudio.com</div>
+              <div class="msg-copy-row"><button class="btn-copy" onclick="copyText('e2m3',this)">Copiar mensaje</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ POSTS ═════════════════════════════════════════════ -->
+    <div class="section" id="posts-all">
+      <div class="breadcrumb"><span>Contenido</span><span class="sep">/</span><span>Publicaciones</span></div>
+      <div class="page-header">
+        <div class="page-title">20 Publicaciones LinkedIn</div>
+        <div class="page-subtitle">Frecuencia: 3 publicaciones semanales (lunes, miercoles, viernes). Copia el texto de cada post directamente desde la tarjeta.</div>
+      </div>
+
+      <div class="filter-bar">
+        <span class="filter-chip active" data-filter="all">Todas (20)</span>
+        <span class="filter-chip" data-filter="educativo">Educativo</span>
+        <span class="filter-chip" data-filter="opinion">Opinion</span>
+        <span class="filter-chip" data-filter="storytelling">Storytelling</span>
+        <span class="filter-chip" data-filter="engagement">Engagement</span>
+        <span class="filter-chip" data-filter="portfolio">Portfolio</span>
+        <span class="filter-chip" data-filter="inspiracional">Inspiracional</span>
+        <span class="filter-chip" data-filter="promocional">Promocional</span>
+      </div>
+
+      <div class="posts-grid" id="postsGrid"></div>
+    </div>
+
+    <!-- ═══ CRECIMIENTO ════════════════════════════════════════ -->
+    <div class="section" id="crecimiento">
+      <div class="breadcrumb"><span>Estrategia</span><span class="sep">/</span><span>Crecimiento &amp; KPIs</span></div>
+      <div class="page-header">
+        <div class="page-title">Estrategia de Crecimiento</div>
+        <div class="page-subtitle">Tacticas de amplificacion organica y KPIs de seguimiento mensual</div>
+      </div>
+
+      <div class="section-title">Tacticas de crecimiento de seguidores</div>
+      <div class="table-wrap" style="margin-bottom:28px">
+        <table>
+          <thead><tr><th>Tactica</th><th>Descripcion</th><th>Frecuencia</th></tr></thead>
+          <tbody>
+            <tr><td class="fw-600">Amplificacion interna</td><td>El equipo de Cambrón Studio comparte y comenta las publicaciones de Laura en las primeras 2 horas para aumentar el alcance orgánico del algoritmo.</td><td class="mono muted">Cada post</td></tr>
+            <tr><td class="fw-600">Engagement proactivo</td><td>Comentar en posts de decisores del público objetivo con valor real. No genérico, sino aportando perspectiva y criterio.</td><td class="mono muted">10 comentarios / dia</td></tr>
+            <tr><td class="fw-600">Colaboraciones</td><td>Co-publicaciones mensuales con partners estratégicos: consultoras, inversores, otros fundadores del sector marketing y tecnología.</td><td class="mono muted">1 / mes</td></tr>
+            <tr><td class="fw-600">Etiquetado estrategico</td><td>Etiquetar a personas relevantes en posts donde el contenido sea directamente valioso para ellos.</td><td class="mono muted">Max 3 etiquetas / post</td></tr>
+            <tr><td class="fw-600">LinkedIn Newsletter</td><td>Newsletter mensual "Neuromarketing en Accion" con casos prácticos, que aumenta la base de seguidores y genera afinidad de marca.</td><td class="mono muted">1 / mes</td></tr>
+            <tr><td class="fw-600">Sales Navigator outreach</td><td>Combinar la estrategia de contenidos con los embudos de mensajes para un enfoque de inbound + outbound integrado.</td><td class="mono muted">Continuo</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section-title">KPIs de seguimiento mensual</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>KPI</th><th>Objetivo Mes 1–3</th><th>Objetivo Mes 6+</th><th>Progreso referencia</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="fw-600">Seguidores nuevos / mes</td>
+              <td><span class="tag tag-line">+150–250</span></td>
+              <td><span class="tag tag-green">+400+</span></td>
+              <td><div class="kpi-progress"><div class="kpi-bar" style="width:45%"></div></div></td>
+            </tr>
+            <tr>
+              <td class="fw-600">Tasa de engagement posts</td>
+              <td><span class="tag tag-line">2–4%</span></td>
+              <td><span class="tag tag-green">5%+</span></td>
+              <td><div class="kpi-progress"><div class="kpi-bar" style="width:40%"></div></div></td>
+            </tr>
+            <tr>
+              <td class="fw-600">Solicitudes de conexion enviadas</td>
+              <td><span class="tag tag-line">50 / semana</span></td>
+              <td><span class="tag tag-green">80 / semana</span></td>
+              <td><div class="kpi-progress"><div class="kpi-bar" style="width:62%"></div></div></td>
+            </tr>
+            <tr>
+              <td class="fw-600">Tasa de aceptacion conexiones</td>
+              <td><span class="tag tag-line">&gt;35%</span></td>
+              <td><span class="tag tag-green">&gt;45%</span></td>
+              <td><div class="kpi-progress"><div class="kpi-bar" style="width:35%"></div></div></td>
+            </tr>
+            <tr>
+              <td class="fw-600">Respuestas a mensajes de embudo</td>
+              <td><span class="tag tag-line">&gt;15%</span></td>
+              <td><span class="tag tag-green">&gt;25%</span></td>
+              <td><div class="kpi-progress"><div class="kpi-bar" style="width:55%"></div></div></td>
+            </tr>
+            <tr>
+              <td class="fw-600">Leads cualificados / mes</td>
+              <td><span class="tag tag-line">3–5</span></td>
+              <td><span class="tag tag-green">10–15</span></td>
+              <td><div class="kpi-progress"><div class="kpi-bar" style="width:33%"></div></div></td>
+            </tr>
+            <tr>
+              <td class="fw-600">Reuniones conseguidas / mes</td>
+              <td><span class="tag tag-line">2–3</span></td>
+              <td><span class="tag tag-green">8–10</span></td>
+              <td><div class="kpi-progress"><div class="kpi-bar" style="width:30%"></div></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══ HASHTAGS ══════════════════════════════════════════ -->
+    <div class="section" id="hashtags">
+      <div class="breadcrumb"><span>Estrategia</span><span class="sep">/</span><span>Hashtags &amp; Keywords</span></div>
+      <div class="page-header">
+        <div class="page-title">Hashtags &amp; Palabras Clave SEO</div>
+        <div class="page-subtitle">Sistema de hashtags por volumen y keywords para posicionamiento organico en LinkedIn</div>
+      </div>
+
+      <div class="cards-grid cols-3" style="margin-bottom:24px">
+        <div class="card">
+          <div class="card-label">Alto volumen</div>
+          <div class="card-title" style="margin-bottom:14px">Hashtags masivos</div>
+          <div class="hashtag-cloud">
+            <span class="hashtag-item lg">#Marketing</span>
+            <span class="hashtag-item lg">#MarketingDigital</span>
+            <span class="hashtag-item lg">#Publicidad</span>
+            <span class="hashtag-item lg">#Branding</span>
+            <span class="hashtag-item lg">#Emprendimiento</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-label">Nicho especializado</div>
+          <div class="card-title" style="margin-bottom:14px">Hashtags de nicho</div>
+          <div class="hashtag-cloud">
+            <span class="hashtag-item">#Neuromarketing</span>
+            <span class="hashtag-item">#PublicidadCreativa</span>
+            <span class="hashtag-item">#PsicologiaDelConsumidor</span>
+            <span class="hashtag-item">#EstrategiaDeMarketing</span>
+            <span class="hashtag-item">#MarketingDeResultados</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-label">Marca propia</div>
+          <div class="card-title" style="margin-bottom:14px">Hashtags de marca</div>
+          <div class="hashtag-cloud">
+            <span class="hashtag-item">#CambronStudio</span>
+            <span class="hashtag-item">#PublicidadQueConvierte</span>
+            <span class="hashtag-item">#ComportamientoDelConsumidor</span>
+            <span class="hashtag-item">#Storytelling</span>
+            <span class="hashtag-item">#MarketingCientifico</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="section-title">Regla de uso por publicacion</div>
+      <div class="cards-grid cols-3">
+        <div class="card card-sm"><div class="card-label">Regla 1</div><div class="card-title">Maximo 5 hashtags por post</div><div class="card-body">LinkedIn penaliza el spam de hashtags. Entre 3 y 5 es el rango optimo para alcance organico.</div></div>
+        <div class="card card-sm"><div class="card-label">Regla 2</div><div class="card-title">Combina los tres tipos</div><div class="card-body">Siempre 1 de alto volumen + 2 de nicho + 1 de marca. Maximiza visibilidad y posicionamiento a la vez.</div></div>
+        <div class="card card-sm"><div class="card-label">Regla 3</div><div class="card-title">Colocalos al final del post</div><div class="card-body">Los hashtags al final no interrumpen la lectura y son igualmente indexados por el algoritmo de LinkedIn.</div></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ─── POST DATA ─────────────────────────────────────────────
+const posts = [
+  {
+    num: 1, type: "educativo",
+    objetivo: "Educativo — Neuromarketing",
+    formato: "Carrusel recomendado",
+    publico: "CEOs, Marketing Managers",
+    hashtags: "#Neuromarketing #Marketing #PsicologiaDelConsumidor #PublicidadCreativa",
+    text: `Durante décadas hemos asumido que el consumidor analiza, compara y decide de forma racional.
+
+Sin embargo, la neurociencia del comportamiento demuestra que esto no es del todo cierto.
+
+La emoción aparece primero, activa la decisión, y la lógica entra después únicamente para justificar lo que ya ha ocurrido a nivel subconsciente.
+
+Esto cambia completamente la forma en la que entendemos la publicidad y el marketing moderno.
+
+No se trata solo de comunicar información, sino de activar respuestas emocionales que influyen en la percepción antes del análisis racional.
+
+¿Tu publicidad actual está diseñada para hablar al sistema emocional o al racional?`
+  },
+  {
+    num: 2, type: "educativo",
+    objetivo: "Educativo — Branding",
+    formato: "Carrusel (5–7 slides)",
+    publico: "Marketing Managers, CEOs",
+    hashtags: "#Branding #MarketingDigital #EstrategiaDeMarketing #IdentidadDeMarca",
+    text: `5 errores de branding que hacen que tu empresa parezca pequeña (aunque no lo sea)
+
+1. Tener un logo genérico que no diferencia
+2. Comunicar CARACTERÍSTICAS en lugar de TRANSFORMACIONES
+3. Cambiar el tono de voz según la plataforma
+4. No tener una historia de marca clara
+5. Diseño inconsistente en todos los touchpoints
+
+El branding no es estética. Es la suma de todas las percepciones que genera tu marca en la mente del cliente.
+
+¿Cuál de estos errores reconoces en tu empresa?`
+  },
+  {
+    num: 3, type: "opinion",
+    objetivo: "Opinion — Industria",
+    formato: "Texto de opinion + imagen",
+    publico: "CEOs, Emprendedores",
+    hashtags: "#Neuromarketing #PublicidadCreativa #MarketingEstrategico",
+    text: `La publicidad que más vende no es la más creativa.
+
+Es la que mejor entiende a su cliente.
+
+Podemos gastar semanas diseñando el anuncio perfecto, pero si no sabemos qué miedo, qué deseo o qué inseguridad tiene nuestra audiencia antes de verlo… el anuncio no sirve de nada.
+
+El neuromarketing no es una fórmula mágica.
+Es el proceso de escuchar al consumidor antes de hablarle.
+
+Y en eso, la mayoría de marcas aún tienen mucho por mejorar.
+
+¿Tú qué opinas?`
+  },
+  {
+    num: 4, type: "engagement",
+    objetivo: "Engagement — Comunidad",
+    formato: "Pregunta + imagen",
+    publico: "Toda la comunidad",
+    hashtags: "#Marketing #PublicidadDigital #ComunidadMarketing #Encuesta",
+    text: `Pregunta rápida para los que trabajáis en marketing:
+
+¿Cuál es el mayor reto que tenéis ahora mismo con vuestras campañas?
+
+A. Conseguir atención inicial
+B. Que conviertan de verdad
+C. Diferenciarse de la competencia
+D. Medir el impacto real
+
+Leo todos los comentarios. Me ayuda mucho entender qué está pasando en el sector.`
+  },
+  {
+    num: 5, type: "storytelling",
+    objetivo: "Storytelling — Marca Personal",
+    formato: "Texto narrativo (historia real)",
+    publico: "CEOs, Emprendedores, Marketing Managers",
+    hashtags: "#Emprendimiento #Neuromarketing #MarketingDeResultados #Storytelling",
+    text: `Hace 2 años lancé Cambrón Studio con una convicción: la publicidad basada en el comportamiento humano siempre superará a la publicidad basada en intuición.
+
+Los primeros meses fueron difíciles. Nadie me conocía. Tenía que demostrar que el neuromarketing no era un concepto abstracto, sino una herramienta real con resultados medibles.
+
+El primer cliente que confió en nosotros tenía campañas con un coste por adquisición brutal. Lo que cambiamos no fue el diseño ni el presupuesto.
+
+Cambiamos el mensaje. Lo alineamos con cómo realmente decide su cliente.
+
+En 6 semanas el CPA bajó un 40%.
+
+Eso fue lo que me confirmó que íbamos por el camino correcto.
+
+¿Qué momento te confirmó a ti que estabas en el camino correcto?`
+  },
+  {
+    num: 6, type: "educativo",
+    objetivo: "Educativo — Tactica concreta",
+    formato: "Carrusel (3–5 slides)",
+    publico: "Marketing Managers",
+    hashtags: "#MarketingDigital #PublicidadDigital #Neuromarketing #MetaAds #GoogleAds",
+    text: `El framework de 3 preguntas que usamos antes de lanzar cualquier campaña:
+
+1. ¿Qué emoción queremos activar en los primeros 3 segundos?
+2. ¿Qué fricción cognitiva tiene el CTA? ¿Es demasiado complejo o demasiado genérico?
+3. ¿La promesa del anuncio y la landing page cuentan la misma historia?
+
+Si no puedes responder estas 3 preguntas antes del lanzamiento, la campaña necesita más trabajo.
+
+Guárdalo para tu próxima campaña.`
+  },
+  {
+    num: 7, type: "portfolio",
+    objetivo: "Portfolio — Caso Before/After",
+    formato: "Imagen + texto (before/after)",
+    publico: "CEOs, Marketing Managers",
+    hashtags: "#PublicidadDigital #Neuromarketing #MetaAds #MarketingDeResultados #CasoDeExito",
+    text: `ANTES vs DESPUÉS de aplicar neuromarketing a una campaña:
+
+ANTES:
+— Anuncio con propuesta de valor genérica ("Somos los mejores")
+— CTA: "Más información"
+— Targeting amplio sin segmentación emocional
+— Resultado: CTR 0.8% · CPA 95€
+
+DESPUÉS:
+— Mensaje que activa el miedo a quedarse atrás
+— CTA: "Descubre si tu estrategia está fallando"
+— Segmentación por comportamiento e intereses de decisores
+— Resultado: CTR 3.2% · CPA 34€
+
+La creatividad sin estrategia psicológica es entretenimiento. Con ella, es conversión.
+
+¿Quieres analizar tu campaña actual?`
+  },
+  {
+    num: 8, type: "educativo",
+    objetivo: "Educativo — Concepto clave",
+    formato: "Texto + imagen explicativa",
+    publico: "Toda la audiencia",
+    hashtags: "#Neuromarketing #MarketingComportamental #PsicologiaDelConsumidor #Publicidad",
+    text: `¿Qué es exactamente el neuromarketing? (Sin tecnicismos)
+
+El cerebro humano toma decisiones de compra en menos de 2.5 segundos. En ese tiempo procesa emoción, memoria y percepción, no datos racionales.
+
+El neuromarketing es la aplicación de lo que sabemos sobre cómo funciona el cerebro para diseñar mensajes, experiencias y campañas que conectan con ese proceso de forma natural.
+
+No es manipulación.
+Es entender al cliente tan bien que nuestro mensaje le llega exactamente cuando y como lo necesita.`
+  },
+  {
+    num: 9, type: "opinion",
+    objetivo: "Engagement — Debate profesional",
+    formato: "Texto de debate",
+    publico: "Marketing Managers, CEOs",
+    hashtags: "#Marketing #EstrategiaDeMarketing #MarketingDigital #Publicidad #Emprendimiento",
+    text: `Opinión polémica (o no tanto):
+
+El 80% del presupuesto de marketing se desperdicia no por falta de dinero sino por falta de estrategia.
+
+Lo veo constantemente:
+— Empresas que invierten 10.000€/mes en Meta Ads con mensajes genéricos
+— Startups que lanzan campañas antes de entender qué problema resuelven para su cliente
+— Marcas que optimizan creatividades sin tocar la estrategia de fondo
+
+El problema no es cuánto inviertes.
+Es en qué y con qué enfoque.
+
+¿Estás de acuerdo? ¿O el problema es otro en tu experiencia?`
+  },
+  {
+    num: 10, type: "educativo",
+    objetivo: "Educativo — Dato sorprendente",
+    formato: "Dato + imagen + explicación",
+    publico: "CEOs, Emprendedores",
+    hashtags: "#Neuromarketing #ComportamientoDelConsumidor #Branding #MarketingCientifico",
+    text: `Dato que cambia cómo entiendes la publicidad:
+
+El 95% de las decisiones de compra se toman en el subconsciente.
+(Fuente: Harvard Business School)
+
+Significa que cuando un cliente te dice "lo tengo que pensar"… en realidad ya ha decidido. Y esa decisión la tomó en los primeros segundos de contacto con tu marca.
+
+Por eso importa tanto:
+— La primera impresión visual
+— El tono de voz
+— La emoción que activa tu mensaje antes de que lean el copy
+
+¿Tu marca está diseñada para los primeros 3 segundos?`
+  },
+  {
+    num: 11, type: "storytelling",
+    objetivo: "Behind the scenes — Humanización",
+    formato: "Video o carrusel fotos",
+    publico: "Toda la comunidad",
+    hashtags: "#BehindTheScenes #AgenciaDeMarketing #CambronStudio #Neuromarketing #VidaDeCEO",
+    text: `Un día normal en Cambrón Studio:
+
+7:30 — Revisión de métricas de campañas activas de clientes
+9:00 — Sesión de estrategia: construyendo el mapa de emociones de una nueva campaña
+12:00 — Llamada con cliente para presentar resultados del mes
+14:30 — Taller interno: nuevas tendencias en publicidad basada en IA
+17:00 — Revisión de copy de 3 anuncios con lente de neuromarketing
+19:00 — Networking con emprendedores del ecosistema Barcelona 22@
+
+Lo que más me gusta de lo que hacemos: cada día aprendemos algo nuevo sobre cómo funciona la mente del consumidor. Y eso se traduce directamente en resultados para nuestros clientes.
+
+¿Cómo es vuestro día a día en marketing?`
+  },
+  {
+    num: 12, type: "educativo",
+    objetivo: "Educativo — Herramienta práctica",
+    formato: "Hilo / Carrusel",
+    publico: "Marketing Managers",
+    hashtags: "#MarketingDigital #Neuromarketing #PublicidadDigital #ChecklistMarketing",
+    text: `La checklist de neuromarketing que usamos antes de publicar cualquier anuncio:
+
+— ¿El visual activa una emoción en menos de 3 segundos?
+— ¿El headline habla a un deseo o a un miedo real del cliente?
+— ¿Hay un solo mensaje principal (no tres)?
+— ¿El CTA es específico y de bajo riesgo percibido?
+— ¿La landing page continúa la promesa del anuncio sin fricción?
+— ¿Hemos eliminado todo elemento que distraiga del objetivo?
+— ¿Hay prueba social visible en las primeras 2 pantallas?
+
+Guárdala. Te va a ahorrar dinero.
+
+¿Qué añadirías tú a la lista?`
+  },
+  {
+    num: 13, type: "inspiracional",
+    objetivo: "Inspiracional — Liderazgo",
+    formato: "Texto con cita",
+    publico: "CEOs, Emprendedores",
+    hashtags: "#Liderazgo #Branding #Neuromarketing #Emprendimiento #Marketing",
+    text: `"La gente no compra lo que haces. Compra por qué lo haces."
+— Simon Sinek
+
+Llevamos años aplicando esto con nuestros clientes, y funciona.
+
+Pero hay una capa más profunda que Sinek no menciona:
+
+La gente compra cuando EL POR QUÉ activa la emoción correcta en el momento adecuado.
+
+Puedes tener el "por qué" más bonito del mundo. Si no llega en el momento emocional correcto del consumidor, no conecta.
+
+Eso es lo que trabajamos en Cambrón Studio: el "por qué" + el "cuándo" + el "cómo" emocional.
+
+¿Tu marca sabe cuándo y cómo llegar a su cliente?`
+  },
+  {
+    num: 14, type: "educativo",
+    objetivo: "Educativo — Sector específico (Tech)",
+    formato: "Texto + imagen sectorial",
+    publico: "CEOs startups tecnológicas",
+    hashtags: "#Startups #MarketingB2B #SaaS #ComunicacionEstrategica #Neuromarketing",
+    text: `Para los que tenéis startups tech: el error de comunicación más frecuente que veo.
+
+Explicáis vuestra tecnología.
+Pero no explicáis el problema que resolvéis.
+
+Ejemplo:
+MAL — "Nuestra plataforma usa IA para optimizar procesos de RRHH con algoritmos predictivos"
+BIEN — "Tu equipo de RRHH deja de perder 12 horas semanales en tareas que nuestra IA hace en 20 minutos"
+
+La diferencia no es de producto. Es de perspectiva.
+
+El cliente no compra tu tecnología.
+Compra el resultado que le da.
+
+¿Tu pitch está orientado al producto o al resultado?`
+  },
+  {
+    num: 15, type: "portfolio",
+    objetivo: "Testimonial / Social proof",
+    formato: "Cita de cliente + imagen",
+    publico: "Toda la audiencia",
+    hashtags: "#CasoDeExito #Neuromarketing #Publicidad #MarketingDeResultados #Branding",
+    text: `El mejor feedback que puede recibir una agencia de neuromarketing:
+
+"Llevábamos meses invirtiendo en publicidad sin ver resultados claros. Después de trabajar con Cambrón Studio, no cambiamos el presupuesto. Cambiamos cómo pensábamos sobre nuestro cliente. Y los resultados llegaron solos."
+— Marketing Director, empresa mediana sector retail, Barcelona
+
+Nuestro trabajo no es hacer anuncios bonitos.
+Es cambiar la forma en que las marcas entienden a sus clientes.
+
+Y cuando eso pasa, todo lo demás fluye.
+
+¿Quieres que analicemos tu estrategia actual?`
+  },
+  {
+    num: 16, type: "educativo",
+    objetivo: "Educativo — Tendencias",
+    formato: "Carrusel con datos",
+    publico: "Marketing Managers, CEOs",
+    hashtags: "#MarketingTendencias2025 #Marketing #IA #PublicidadDigital #Neuromarketing",
+    text: `Tendencias de marketing que van a dominar 2025 (basadas en comportamiento del consumidor):
+
+1. Hiperpersonalización emocional en publicidad
+2. Video de menos de 15 segundos como formato de conversión principal
+3. Marketing de comunidad sobre marketing de broadcast
+4. Contenido educativo que posiciona como experto (thought leadership)
+5. IA para personalización de mensajes a escala
+
+Lo que no cambiará:
+El cerebro humano sigue tomando decisiones igual que hace 10.000 años.
+Emoción — Intuición — Racionalización posterior.
+
+Las marcas que entiendan esto seguirán ganando.
+
+¿Cuál de estas tendencias ya estás aplicando?`
+  },
+  {
+    num: 17, type: "storytelling",
+    objetivo: "Manifiesto — Valores de marca",
+    formato: "Texto largo + imagen de marca",
+    publico: "Toda la comunidad",
+    hashtags: "#CambronStudio #Neuromarketing #PublicidadCreativa #MisionDeMarca #Emprendimiento",
+    text: `Por qué fundé Cambrón Studio.
+
+Llevaba años trabajando en marketing y publicidad viendo siempre lo mismo:
+Muchas marcas invirtiendo mucho dinero. Pocos resultados reales.
+
+El problema no era la inversión. Era que la mayoría de campañas se diseñaban desde la perspectiva de la marca, no desde la perspectiva del cliente.
+
+Hacer publicidad basada en lo que creemos que queremos comunicar, en lugar de basarla en cómo funciona realmente la mente de la persona que la va a recibir.
+
+Decidí crear Cambrón Studio para cambiar eso.
+
+Para demostrar que cuando entiendes el comportamiento del consumidor, la publicidad deja de ser un gasto y se convierte en una inversión con retorno predecible.
+
+Esa es nuestra misión.
+Esa es nuestra obsesión.
+
+Bienvenidos a Cambrón Studio.`
+  },
+  {
+    num: 18, type: "educativo",
+    objetivo: "Educativo — Quick tip",
+    formato: "Texto corto + imagen",
+    publico: "Marketing Managers",
+    hashtags: "#QuickTip #Neuromarketing #CopywritingPersuasivo #MarketingDigital",
+    text: `Quick tip de neuromarketing para tu próximo anuncio:
+
+Usa el principio de ESCASEZ + ESPECIFICIDAD.
+
+MAL — "Oferta limitada" (demasiado genérico)
+BIEN — "Solo quedan 7 plazas para el mes de enero"
+
+El cerebro responde más intensamente a la escasez específica que a la genérica.
+Cuanto más concreto, más real parece la urgencia. Y más activa el FOMO.
+
+Testéalo en tu próximo anuncio y cuéntame qué pasa.`
+  },
+  {
+    num: 19, type: "engagement",
+    objetivo: "Networking — Colaboracion",
+    formato: "Texto de comunidad",
+    publico: "Toda la comunidad",
+    hashtags: "#ComunidadMarketing #NetworkingBarcelona #Marketers #Publicidad #Neuromarketing",
+    text: `Estamos construyendo una comunidad de marketers, emprendedores y directivos que creen que la publicidad puede ser más inteligente y más humana al mismo tiempo.
+
+Si tú también trabajas en esta dirección, conectemos.
+
+Y si conoces a alguien que debería estar en esta conversación, etiquétalo aquí abajo.
+
+La mejor publicidad se construye en comunidad.`
+  },
+  {
+    num: 20, type: "promocional",
+    objetivo: "Promocional — Oferta directa (soft sell)",
+    formato: "Imagen + texto con CTA claro",
+    publico: "CEOs, Marketing Managers listos para contratar",
+    hashtags: "#MarketingDeResultados #Neuromarketing #PublicidadQueConvierte #CambronStudio #Estrategia",
+    text: `¿Tu publicidad está generando los resultados que esperabas?
+
+Si la respuesta es "podría ir mejor", esta semana abrimos 3 plazas para un Diagnóstico Estratégico de Publicidad gratuito.
+
+En 45 minutos analizamos:
+— Tu campaña actual o estrategia de comunicación
+— Los 3 puntos críticos que están limitando tus conversiones
+— Qué cambiaría Cambrón Studio y por qué
+
+No es una llamada de venta. Es un diagnóstico real con valor concreto.
+Solo 3 plazas disponibles esta semana.
+
+Escríbeme "DIAGNÓSTICO" en un mensaje privado y lo gestionamos.
+
+¿A quién conoces que necesite esto?`
+  }
+];
+
+// ─── RENDER POSTS ──────────────────────────────────────────
+function renderPosts(filter = 'all') {
+  const grid = document.getElementById('postsGrid');
+  const filtered = filter === 'all' ? posts : posts.filter(p => p.type === filter);
+  grid.innerHTML = filtered.map(p => `
+    <div class="post-card" data-type="${p.type}">
+      <div class="post-card-header">
+        <span class="post-num">POST ${String(p.num).padStart(2,'0')}</span>
+        <div class="post-meta">
+          <span class="tag tag-line">${p.formato}</span>
+          <span class="tag tag-purple">${p.type}</span>
+        </div>
+      </div>
+      <div class="post-body">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+          <span class="tag tag-line" style="font-size:10px">${p.objetivo}</span>
+        </div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--ink-4);margin-bottom:6px;letter-spacing:0.08em;text-transform:uppercase">Publico: ${p.publico}</div>
+        <div class="post-text" id="pt-${p.num}">${p.text}</div>
+      </div>
+      <div class="post-footer">
+        <div class="post-hashtags">${p.hashtags}</div>
+        <button class="btn-expand" onclick="togglePost(${p.num},this)">Ver todo</button>
+        <button class="btn-copy" onclick="copyPost(${p.num},this)">Copiar</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function togglePost(num, btn) {
+  const el = document.getElementById(`pt-${num}`);
+  el.classList.toggle('expanded');
+  btn.textContent = el.classList.contains('expanded') ? 'Colapsar' : 'Ver todo';
+}
+
+function copyPost(num, btn) {
+  const p = posts.find(x => x.num === num);
+  const full = p.text + '\n\n' + p.hashtags;
+  navigator.clipboard.writeText(full).then(() => {
+    btn.textContent = 'Copiado';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copiar'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ─── FILTER CHIPS ──────────────────────────────────────────
+document.querySelectorAll('.filter-chip').forEach(chip => {
+  chip.addEventListener('click', function() {
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    this.classList.add('active');
+    renderPosts(this.dataset.filter);
+  });
+});
+
+// ─── COPY HELPERS ──────────────────────────────────────────
+function copyText(id, btn) {
+  const el = document.getElementById(id);
+  navigator.clipboard.writeText(el.innerText || el.textContent).then(() => {
+    btn.textContent = 'Copiado';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = btn.dataset.original || 'Copiar'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+function copyElement(text, btn) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copiado';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copiar CTA'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ─── NAV ───────────────────────────────────────────────────
+function navigate(sectionId) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const sec = document.getElementById(sectionId);
+  if (sec) { sec.classList.add('active'); sec.scrollTop = 0; }
+  const navItem = document.querySelector(`.nav-item[data-section="${sectionId}"]`);
+  if (navItem) navItem.classList.add('active');
+  if (sectionId === 'posts-all') renderPosts('all');
+}
+
+document.querySelectorAll('.nav-item[data-section]').forEach(item => {
+  item.addEventListener('click', () => navigate(item.dataset.section));
+});
+
+// ─── SEARCH ────────────────────────────────────────────────
+const searchIndex = [
+  { section: 'overview', title: 'Resumen general', preview: 'Dashboard principal con KPIs y mapa de contenidos' },
+  { section: 'perfil-identidad', title: 'Identidad del Perfil', preview: 'Nombre, cargo, URL, headline optimizado' },
+  { section: 'perfil-about', title: 'Extracto Acerca de', preview: 'Texto completo del extracto orientado al cliente potencial' },
+  { section: 'perfil-exp', title: 'Experiencia y Keywords SEO', preview: 'Historial profesional y palabras clave para posicionamiento' },
+  { section: 'seg-persona1', title: 'Buyer Persona 1 — Marketing Manager', preview: 'Filtros Sales Navigator, pain points, justificacion' },
+  { section: 'seg-persona2', title: 'Buyer Persona 2 — CEO / Founder', preview: 'Filtros Sales Navigator para startups y PYMES' },
+  { section: 'embudo1', title: 'Embudo 1 — Reunion de descubrimiento', preview: '3 mensajes para conseguir videollamada con Marketing Managers' },
+  { section: 'embudo2', title: 'Embudo 2 — Demo + recurso gratuito', preview: '3 mensajes para CEOs y Fundadores de startups' },
+  { section: 'posts-all', title: '20 Publicaciones LinkedIn', preview: 'Todos los posts con texto completo y hashtags' },
+  { section: 'crecimiento', title: 'Estrategia de Crecimiento y KPIs', preview: 'Tacticas de amplificacion, metricas y objetivos mensuales' },
+  { section: 'hashtags', title: 'Hashtags y Keywords SEO', preview: 'Sistema de hashtags por volumen y reglas de uso' },
+  ...posts.map(p => ({
+    section: 'posts-all',
+    title: `Post ${p.num} — ${p.objetivo}`,
+    preview: p.text.substring(0, 80) + '…'
+  }))
+];
+
+const searchInput = document.getElementById('globalSearch');
+const searchResults = document.getElementById('searchResults');
+
+searchInput.addEventListener('input', function() {
+  const q = this.value.toLowerCase().trim();
+  if (!q) { searchResults.classList.remove('show'); return; }
+  const matches = searchIndex.filter(item =>
+    item.title.toLowerCase().includes(q) ||
+    item.preview.toLowerCase().includes(q)
+  ).slice(0, 8);
+  if (!matches.length) { searchResults.classList.remove('show'); return; }
+  searchResults.innerHTML = matches.map(m => `
+    <div class="search-result-item" onclick="navigate('${m.section}');searchInput.value='';searchResults.classList.remove('show')">
+      <div class="sri-section">${m.section.replace(/-/g,' ')}</div>
+      <div class="sri-title">${m.title}</div>
+      <div class="sri-preview">${m.preview}</div>
+    </div>
+  `).join('');
+  searchResults.classList.add('show');
+});
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.search-wrap')) searchResults.classList.remove('show');
+});
+
+// ─── INIT ──────────────────────────────────────────────────
+renderPosts('all');
+</script>
+</body>
+</html>
